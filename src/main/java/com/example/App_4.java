@@ -6,18 +6,22 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-/**
- * JavaFX App
- */
 public class App_4 extends Application {
 
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws IOException {
+        // Carregar o ícone da imagem
+        Image icon = new Image(getClass()
+                .getResourceAsStream("/com/example/central-de-ajuda.png"));
+
+        // Definir o ícone da janela
+        stage.getIcons().add(icon);
+
         scene = new Scene(loadFXML("primary"));
         stage.setScene(scene);
 
@@ -37,5 +41,4 @@ public class App_4 extends Application {
     public static void main(String[] args) {
         launch();
     }
-
 }

@@ -1,11 +1,9 @@
 package com.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -18,9 +16,6 @@ public class PrimaryController {
 
     @FXML
     private TextField f2;
-
-    @FXML
-    private TextArea lblResultado;
 
     @FXML
     private RadioButton rbCategoriaComputador;
@@ -40,7 +35,10 @@ public class PrimaryController {
     @FXML
     private RadioButton rbAtividadeEncerrado;
 
-    private List<HelpDeskTicket> tickets = new ArrayList<>();
+    @FXML
+    private ListView<HelpDeskTicket> chamadosListView;
+
+    private ObservableList<HelpDeskTicket> tickets = FXCollections.observableArrayList();
 
     private ToggleGroup categoriaToggleGroup = new ToggleGroup();
     private ToggleGroup atividadeToggleGroup = new ToggleGroup();
@@ -53,6 +51,8 @@ public class PrimaryController {
         rbAtividadePrimeiroContato.setToggleGroup(atividadeToggleGroup);
         rbAtividadeAtendido.setToggleGroup(atividadeToggleGroup);
         rbAtividadeEncerrado.setToggleGroup(atividadeToggleGroup);
+
+        chamadosListView.setItems(tickets);
     }
 
     public void confirmar() {
@@ -86,39 +86,88 @@ public class PrimaryController {
     }
 
     public void remover() {
-        if (!tickets.isEmpty()) {
-            tickets.remove(tickets.size() - 1);
+        HelpDeskTicket selectedTicket = chamadosListView.getSelectionModel().getSelectedItem();
+        if (selectedTicket != null) {
+            tickets.remove(selectedTicket);
             updateTicketsTextArea();
         }
     }
 
+    public void selecionar() {
+        HelpDeskTicket selectedTicket = chamadosListView.getSelectionModel().getSelectedItem();
+        if (selectedTicket != null) {
+            f1.setText(selectedTicket.getUserName());
+            f2.setText(selectedTicket.getEquipmentCode());
+
+            switch (selectedTicket.getCategory()) {
+                case "Computador":
+                    rbCategoriaComputador.setSelected(true);
+                    break;
+                case "Impressora":
+                    rbCategoriaImpressora.setSelected(true);
+                    break;
+                case "Rede":
+                    rbCategoriaRede.setSelected(true);
+                    break;
+            }
+
+            switch (selectedTicket.getActivity()) {
+                case "Primeiro Contato":
+                    rbAtividadePrimeiroContato.setSelected(true);
+                    break;
+                case "Atendido":
+                    rbAtividadeAtendido.setSelected(true);
+                    break;
+                case "Encerrado":
+                    rbAtividadeEncerrado.setSelected(true);
+                    break;
+            }
+        }
+    }
+
+    private void refreshListView() {
+        chamadosListView.getItems().clear();
+        chamadosListView.getItems().addAll(tickets);
+    }
+
     public void alterar() {
-        // Implement ticket modification logic here
         if (!tickets.isEmpty()) {
-            HelpDeskTicket selectedTicket = tickets.get(tickets.size() - 1);
-            String newCategory = "";
-            String newActivity = "";
+            int selectedIndex = chamadosListView.getSelectionModel().getSelectedIndex();
 
-            if (rbCategoriaComputador.isSelected()) {
-                newCategory = "Computador";
-            } else if (rbCategoriaImpressora.isSelected()) {
-                newCategory = "Impressora";
-            } else if (rbCategoriaRede.isSelected()) {
-                newCategory = "Rede";
+            if (selectedIndex >= 0) {
+                HelpDeskTicket selectedTicket = tickets.get(selectedIndex);
+
+                String newCategory = "";
+                String newActivity = "";
+
+                if (rbCategoriaComputador.isSelected()) {
+                    newCategory = "Computador";
+                } else if (rbCategoriaImpressora.isSelected()) {
+                    newCategory = "Impressora";
+                } else if (rbCategoriaRede.isSelected()) {
+                    newCategory = "Rede";
+                }
+
+                if (rbAtividadePrimeiroContato.isSelected()) {
+                    newActivity = "Primeiro Contato";
+                } else if (rbAtividadeAtendido.isSelected()) {
+                    newActivity = "Atendido";
+                } else if (rbAtividadeEncerrado.isSelected()) {
+                    newActivity = "Encerrado";
+                }
+
+                // Atualiza as informações do chamado selecionado
+                selectedTicket.setUserName(f1.getText());
+                selectedTicket.setEquipmentCode(f2.getText());
+                selectedTicket.setCategory(newCategory);
+                selectedTicket.setActivity(newActivity);
+
+                // Atualiza a exibição do chamado na ListView
+                chamadosListView.getItems().set(selectedIndex, selectedTicket);
+
+                // Limpa os campos e desmarca os RadioButtons
+                clearFieldsAndRadioButtons();
             }
-
-            if (rbAtividadePrimeiroContato.isSelected()) {
-                newActivity = "Primeiro Contato";
-            } else if (rbAtividadeAtendido.isSelected()) {
-                newActivity = "Atendido";
-            } else if (rbAtividadeEncerrado.isSelected()) {
-                newActivity = "Encerrado";
-            }
-
-            selectedTicket.setCategory(newCategory);
-            selectedTicket.setActivity(newActivity);
-
-            updateTicketsTextArea();
         }
     }
 
@@ -133,13 +182,6 @@ public class PrimaryController {
                     .append("\n");
         }
 
-        lblResultado.setText(sb.toString());
-
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Atenção");
-        alert.setHeaderText(null);
-        alert.setContentText("Chamado Alterado");
-        alert.showAndWait();
     }
 
     private void clearFieldsAndRadioButtons() {

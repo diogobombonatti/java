@@ -29,7 +29,6 @@ public class HelpDeskTicket {
         return activity;
     }
 
-    // Add setters for category and activity
     public void setCategory(String category) {
         this.category = category;
     }
@@ -37,4 +36,21 @@ public class HelpDeskTicket {
     public void setActivity(String activity) {
         this.activity = activity;
     }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setEquipmentCode(String equipmentCode) {
+        this.equipmentCode = equipmentCode;
+    }
+
+    @Override
+    public String toString() {
+        return "Usuário: " + userName +
+                ", Equipamento: " + equipmentCode +
+                ", Categoria: " + category +
+                ", Atividade: " + activity;
+    }
+
 }
