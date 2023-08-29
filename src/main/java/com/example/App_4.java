@@ -16,8 +16,7 @@ public class App_4 extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Carregar o ícone da imagem
-        Image icon = new Image(getClass()
-                .getResourceAsStream("/com/example/central-de-ajuda.png"));
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/central-de-ajuda.png"));
 
         // Definir o ícone da janela
         stage.getIcons().add(icon);
